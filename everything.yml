@@ -15,11 +15,17 @@
       apt:
         name: "docker.io"
 
+    - name: docker systemd
+      lineinfile:
+        dest: /lib/systemd/system/docker.service
+        regexp: '^ExecStart=/usr/bin/dockerd(.*)$'
+        line: ExecStart=/usr/bin/dockerd
+
     - name: enable docker
       systemd:
         name: docker
         enabled: yes
-        state: started
+        state: restarted
 
     - name: kubeadm key
       apt_key:
@@ -78,6 +84,6 @@
     - name: kubeless ns
       command: kubectl create ns kubeless
     - name: kubeless create
-      command: >
+      shell: |
         RELEASE=$(curl -s https://api.github.com/repos/kubeless/kubeless/releases/latest | grep tag_name | cut -d '"' -f 4)
         kubectl create -f https://github.com/kubeless/kubeless/releases/download/$RELEASE/kubeless-$RELEASE.yaml

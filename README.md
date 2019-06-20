@@ -7,10 +7,10 @@ This is a dead simple Kubeless installation on a single node Kubernetes cluster.
 The main purpose was creating a cheap function-as-a-service provider for my hobby
 serverless applications. The monthly fee for a VM with a static IP is way cheaper than the monthly fee on AWS for using an Internet Gateway.
 
-We will install everything on the remove VM and copy back the k8s config file for configuring our local `kubectl`. The stack can be deployed using the following
+We will install everything on the remote VM and copy back the k8s config file for configuring our local `kubectl`. The stack can be deployed using the following
 command:
 
-    ansible-playbook -i hosts site.yml
+    ansible-playbook -i hosts everything.yml
 
 Once done, you can check the results by checking the cluster status:
 
@@ -31,6 +31,10 @@ Finally you can proceed with a serverless deploy:
     $ cd new-project
     $ yarn install
     $ sls deploy
+
+List and call your function:
+
+	$ kubeless function ls
     $ kubeless function call capitalize --data awesome!
 
 The above commands would need `kubectl` and `kubeless` cli tools installed locally. Moreover you would need to copy the cluster config file:
@@ -39,4 +43,4 @@ The above commands would need `kubectl` and `kubeless` cli tools installed local
   	$ scp root@YOUR_HOST:/etc/kubernetes/admin.conf $HOME/.kube/config
   	$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-That was it all.
+Well, I guess that was it!
