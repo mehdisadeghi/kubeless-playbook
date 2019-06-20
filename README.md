@@ -43,6 +43,10 @@ The above commands would need `kubectl` and `kubeless` cli tools installed local
   	$ scp root@YOUR_HOST:/etc/kubernetes/admin.conf $HOME/.kube/config
   	$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-
+References:
+- [Quickstart for Calico on Kubernetes](https://docs.projectcalico.org/v3.7/getting-started/kubernetes/)
+- [Kubeadm Installation](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
+- [cgroup drivers](https://kubernetes.io/docs/setup/production-environment/container-runtimes/)
+- [Kubeless Installation](https://kubeless.io/docs/quick-start/)
 
 Well, I guess that was it!
