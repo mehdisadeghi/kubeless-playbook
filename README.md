@@ -1,4 +1,4 @@
-Building a single node Kubernetes with Kubeless using Ansible Playbooks
+Building a single node Kubeless
 -----------------------------------------------------------------------
 
 Tested with Ansible 2.8 and an Ubuntu 18.04 VM with password-less ssh.
