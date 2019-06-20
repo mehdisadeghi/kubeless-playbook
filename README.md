@@ -1,7 +1,7 @@
-Building a single node Kubernetes with Kubeless using Ansible Playbooks.
-------------------------------------------------------------------------
+Building a single node Kubernetes with Kubeless using Ansible Playbooks
+-----------------------------------------------------------------------
 
-These playbooks require Ansible 1.2.
+Tested with Ansible 2.8 and an Ubuntu 18.04 VM with password-less ssh.
 
 This is a dead simple Kubeless installation on a single node Kubernetes cluster.
 The main purpose was creating a cheap function-as-a-service provider for my hobby
@@ -42,5 +42,7 @@ The above commands would need `kubectl` and `kubeless` cli tools installed local
     $ mkdir -p $HOME/.kube
   	$ scp root@YOUR_HOST:/etc/kubernetes/admin.conf $HOME/.kube/config
   	$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+
 
 Well, I guess that was it!
