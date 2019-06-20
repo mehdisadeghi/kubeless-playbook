@@ -1,0 +1,83 @@
+---
+# This playbook deploys a single node Kubernetes cluster with Kubeless on Ubuntu 18.04
+
+- hosts: all
+  remote_user: root
+  tasks:
+    - name: upgrade
+      apt: update_cache=yes upgrade=full
+
+    - name: reboot
+      reboot:
+        reboot_timeout: 3600
+
+    - name: docker
+      apt:
+        name: "docker.io"
+
+    - name: enable docker
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: kubeadm key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+
+    - name: kubeadm repo
+      apt_repository:
+        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+
+    - name: kubeadm
+      apt:
+        name: "{{ packages }}"
+        update_cache: yes
+      vars:
+        packages:
+        - kubelet
+        - kubeadm
+        - kubectl
+    - dpkg_selections:
+        name: kubelet
+        selection: hold
+    - dpkg_selections:
+        name: kubeadm
+        selection: hold
+    - dpkg_selections:
+        name: kubectl
+        selection: hold
+
+    - name: kubernetes
+      # According to https://docs.projectcalico.org/v3.7/getting-started/kubernetes/
+      # this should run with a sudo-enabled regular user. No time for that.
+      # Also ignoring errors in case of having only one cpu on the VM
+      command: kubeadm init --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=all
+
+    - name: make kube config dir
+      file:
+        path: "{{ ansible_env.HOME }}/.kube"
+        state: directory
+
+    - name: cp kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        remote_src: yes
+        dest: "{{ ansible_env.HOME }}/.kube/config"
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+
+    - name: calico
+      command: kubectl apply -f https://docs.projectcalico.org/v3.7/manifests/calico.yaml
+
+    - name: remove taints on the master
+      command: kubectl taint nodes --all node-role.kubernetes.io/master-
+
+    - name: kubeless ns
+      command: kubectl create ns kubeless
+    - name: kubeless create
+      command: >
+        RELEASE=$(curl -s https://api.github.com/repos/kubeless/kubeless/releases/latest | grep tag_name | cut -d '"' -f 4)
+        kubectl create -f https://github.com/kubeless/kubeless/releases/download/$RELEASE/kubeless-$RELEASE.yaml
