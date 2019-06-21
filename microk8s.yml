@@ -1,0 +1,36 @@
+---
+- hosts: all
+  remote_user: root
+  tasks:
+    - name: kubernetes
+      snap:
+        name: microk8s
+        classic: yes
+
+    - name: wait
+      command: /snap/bin/microk8s.status --wait-ready
+
+    - name: dns
+      command: /snap/bin/microk8s.enable dns
+
+    - name: kubeless ns
+      command: /snap/bin/kubectl create ns kubeless
+
+    - name: kubeless create
+      shell: |
+        RELEASE=$(curl -s https://api.github.com/repos/kubeless/kubeless/releases/latest | grep tag_name | cut -d '"' -f 4)
+        /snap/bin/kubectl create -f https://github.com/kubeless/kubeless/releases/download/$RELEASE/kubeless-$RELEASE.yaml
+
+      #    - name: make kube config dir
+      #      file:
+      #        path: "{{ ansible_env.HOME }}/.kube"
+      #        state: directory
+
+        #    - name: cp kube config
+        #      copy:
+        #        src: /etc/kubernetes/admin.conf
+        #        remote_src: yes
+        #        dest: "{{ ansible_env.HOME }}/.kube/config"
+        #        owner: "{{ ansible_user_id }}"
+        #        group: "{{ ansible_user_id }}"
+
